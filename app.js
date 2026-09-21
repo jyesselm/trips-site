@@ -1,5 +1,5 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SHARED_ACCOUNT } from './config.js';
 
 // config.js ships with placeholders, so the page has to say so rather than
 // hanging on a client that cannot be constructed.
@@ -16,39 +16,45 @@ function show(name) {
   for (const [key, el] of Object.entries(screens)) el.hidden = key !== name;
 }
 
-// The page lives at a project path on GitHub Pages, so redirects and the
-// router both have to respect it rather than assuming the origin root.
-const BASE = location.origin + location.pathname;
-
 // ------------------------------------------------------------------ sign in
+// One shared account, so the form asks for a password and nothing else. The
+// password is checked by Supabase, not by anything in this file -- there is
+// no secret here to read out of the page source.
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!db) return;
-  const email = $('email').value.trim();
+  const password = $('password').value;
   const btn = $('loginBtn');
   const note = $('loginNote');
 
   btn.disabled = true;
-  btn.textContent = 'Sending...';
+  btn.textContent = 'Checking...';
   note.hidden = true;
   note.classList.remove('bad');
 
-  const { error } = await db.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: BASE },
-  });
+  const { error } = await db.auth.signInWithPassword({ email: SHARED_ACCOUNT, password });
 
   btn.disabled = false;
-  btn.textContent = 'Send me a link';
-  note.hidden = false;
+  btn.textContent = 'Let me in';
 
   if (error) {
+    note.hidden = false;
     note.classList.add('bad');
-    note.textContent = error.message;
+    note.textContent = /credential/i.test(error.message)
+      ? 'That password is not right.'
+      : error.message;
+    $('password').select();
     return;
   }
-  note.textContent = `Sent. Open the link in the email at ${email} on this device.`;
+
   $('loginForm').reset();
+  try {
+    await loadTrips();
+  } catch (err) {
+    $('noAccess').hidden = false;
+    $('noAccess').textContent = `Could not load trips: ${err.message}`;
+  }
+  await route();
 });
 
 for (const id of ['signOutHub', 'signOutTrip']) {
@@ -97,11 +103,9 @@ async function loadTrips() {
     // RLS returns an empty set rather than an error for a signed-in person who
     // is not on the allowlist, so this covers both that and a genuinely empty
     // database. Either way the fix is the same.
-    const { data: who } = await db.auth.getUser();
     noAccess.hidden = false;
     noAccess.textContent =
-      `Nothing here for ${who?.user?.email ?? 'this account'} yet. ` +
-      `If that's the wrong address, sign out and try the other one.`;
+      'Signed in, but there are no trips to show. The account may not be on the allowlist yet.';
     return;
   }
 
@@ -154,7 +158,7 @@ async function openTrip(slug) {
 function currentSlug() {
   const hash = location.hash;
   // Supabase drops its tokens in the hash on the way back from the email link.
-  if (!hash || hash.includes('access_token') || hash.includes('error=')) return null;
+  if (!hash || hash.includes('error=')) return null;
   const m = hash.match(/^#\/(.+)$/);
   return m ? decodeURIComponent(m[1]) : null;
 }
@@ -181,7 +185,7 @@ db?.auth.onAuthStateChange((event) => {
     note.classList.add('bad');
     note.textContent =
       'Not connected yet. Paste the Supabase project URL and anon key into config.js, then push.';
-    $('email').disabled = true;
+    $('password').disabled = true;
     $('loginBtn').disabled = true;
     return show('signin');
   }
