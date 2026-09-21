@@ -1,7 +1,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// config.js ships with placeholders, so the page has to say so rather than
+// hanging on a client that cannot be constructed.
+const CONFIGURED =
+  /^https:\/\/[a-z0-9-]+\.supabase\.(co|in)$/i.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 30;
+
+const db = CONFIGURED ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const $ = (id) => document.getElementById(id);
 const screens = { signin: $('signin'), hub: $('hub'), viewer: $('viewer') };
@@ -18,6 +23,7 @@ const BASE = location.origin + location.pathname;
 // ------------------------------------------------------------------ sign in
 $('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!db) return;
   const email = $('email').value.trim();
   const btn = $('loginBtn');
   const note = $('loginNote');
@@ -47,7 +53,7 @@ $('loginForm').addEventListener('submit', async (e) => {
 
 for (const id of ['signOutHub', 'signOutTrip']) {
   $(id).addEventListener('click', async () => {
-    await db.auth.signOut();
+    await db?.auth.signOut();
     location.hash = '';
     show('signin');
   });
@@ -164,11 +170,22 @@ $('backBtn').addEventListener('click', () => { location.hash = ''; });
 window.addEventListener('hashchange', route);
 
 // -------------------------------------------------------------------- boot
-db.auth.onAuthStateChange((event) => {
+db?.auth.onAuthStateChange((event) => {
   if (event === 'SIGNED_OUT') show('signin');
 });
 
 (async function start() {
+  if (!db) {
+    const note = $('loginNote');
+    note.hidden = false;
+    note.classList.add('bad');
+    note.textContent =
+      'Not connected yet. Paste the Supabase project URL and anon key into config.js, then push.';
+    $('email').disabled = true;
+    $('loginBtn').disabled = true;
+    return show('signin');
+  }
+
   const { data: { session } } = await db.auth.getSession();
   if (!session) return show('signin');
 
