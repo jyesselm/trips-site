@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Trips</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#EEF3F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1E21" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23C9426B' d='M24 2c-8.8 0-16 7-16 15.7C8 29.6 24 46 24 46s16-16.4 16-28.3C40 9 32.8 2 24 2z'/%3E%3Ccircle cx='24' cy='17.4' r='6' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Nunito:ital,wght@0,400..800;1,400..700&display=swap">
+<style>
+  :root{
+    --paper:#EEF3F1; --card:#FFFFFF; --ink:#153439; --muted:#5A7C82; --line:#D2E0DC;
+    --rasp:#C9426B; --gold:#B4780F; --leaf:#3F8A69; --sky:#3D7F9B;
+    --shadow:0 1px 2px rgba(21,52,57,.05), 0 8px 22px -14px rgba(21,52,57,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0F1E21; --card:#182C30; --ink:#E7F1EE; --muted:#9BB6B8; --line:#27403F;
+      --rasp:#FF89A8; --gold:#F0C069; --leaf:#7FCBA1; --sky:#8AC9DE;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 26px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0F1E21; --card:#182C30; --ink:#E7F1EE; --muted:#9BB6B8; --line:#27403F;
+    --rasp:#FF89A8; --gold:#F0C069; --leaf:#7FCBA1; --sky:#8AC9DE;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 26px -16px rgba(0,0,0,.8);
+  }
+
+  html{color-scheme:light dark; height:100%}
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100%; background:var(--paper); color:var(--ink);
+    font-family:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+    font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+    display:flex; flex-direction:column}
+  h1,h2{font-family:"Fraunces",Georgia,"Times New Roman",serif; font-weight:600;
+    text-wrap:balance; margin:0}
+  p{margin:0}
+  [hidden]{display:none!important}
+  .eyebrow{font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+
+  .screen{flex:1; display:flex; flex-direction:column}
+  .wrap{width:100%; max-width:730px; margin:0 auto; padding-inline:20px; padding-block:52px 64px}
+
+  /* -------------------------------------------------------------- sign in */
+  #signin .wrap{max-width:430px; padding-block:14vh 64px}
+  .mark{width:36px;height:36px;color:var(--rasp);display:block;margin-bottom:18px}
+  h1{font-size:clamp(36px,9vw,50px); line-height:1.02; letter-spacing:-.02em}
+  h1 em{font-style:italic; color:var(--rasp)}
+  .lede{margin-top:12px; color:var(--muted); font-size:15.5px}
+  form{margin-top:28px; display:flex; flex-direction:column; gap:10px}
+  label{font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  input[type=email]{font:inherit; font-weight:600; padding:13px 15px; border-radius:12px;
+    border:1.5px solid var(--line); background:var(--card); color:var(--ink); width:100%}
+  input[type=email]:focus{outline:none; border-color:var(--rasp)}
+  button{font:inherit; font-weight:800; cursor:pointer; padding:13px 18px; border-radius:12px;
+    border:none; background:var(--rasp); color:#fff; transition:opacity .15s}
+  button:hover{opacity:.88}
+  button:disabled{opacity:.5; cursor:default}
+  .note{margin-top:14px; font-size:13.5px; line-height:1.5; padding:12px 14px; border-radius:12px;
+    background:color-mix(in srgb, var(--leaf) 12%, var(--card)); color:var(--leaf); font-weight:600}
+  .note.bad{background:color-mix(in srgb, var(--rasp) 12%, var(--card)); color:var(--rasp)}
+
+  /* ----------------------------------------------------------------- hub */
+  .hubhead{display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+    margin-bottom:32px}
+  .linkish{background:none; border:none; padding:6px 0; color:var(--muted); font-size:13px;
+    font-weight:800; letter-spacing:.04em; text-decoration:underline; text-underline-offset:3px}
+  .linkish:hover{color:var(--rasp); opacity:1}
+  .trips{display:flex; flex-direction:column; gap:16px; list-style:none; padding:0; margin:0}
+  .trip{background:var(--card); border:1px solid var(--line); border-radius:20px;
+    box-shadow:var(--shadow); overflow:hidden}
+  .trip a{display:grid; grid-template-columns:64px 1fr; gap:18px; align-items:start;
+    padding:22px 24px; text-decoration:none; color:inherit}
+  .trip a:hover{background:color-mix(in srgb, var(--rasp) 5%, var(--card))}
+  .trip a:focus-visible{outline:2.5px solid var(--rasp); outline-offset:-3px}
+  .art{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+    background:color-mix(in srgb, var(--c,var(--sky)) 15%, var(--card));
+    border:1.5px solid color-mix(in srgb, var(--c,var(--sky)) 34%, var(--card));
+    color:var(--c,var(--sky))}
+  .art svg{width:38px;height:38px}
+  .row{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .trip h2{font-size:24px; letter-spacing:-.01em}
+  .pill{font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    padding:3px 9px; border-radius:999px; white-space:nowrap}
+  .when{margin-top:3px; font-size:14.5px; color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums}
+  .blurb{margin-top:8px; font-size:14.5px; opacity:.88}
+  .empty{border:1.5px dashed var(--line); border-radius:20px; padding:28px; text-align:center;
+    color:var(--muted); font-size:14.5px}
+
+  /* ---------------------------------------------------------------- trip */
+  #viewer{flex:1; display:flex; flex-direction:column; min-height:0}
+  .bar{display:flex; align-items:center; gap:14px; padding:11px 18px;
+    background:var(--card); border-bottom:1px solid var(--line); flex:none}
+  .bar strong{font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:16px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .bar .linkish{white-space:nowrap}
+  .bar .spacer{flex:1}
+  iframe{flex:1; width:100%; border:0; display:block; min-height:0; background:var(--paper)}
+
+  .loading{flex:1; display:grid; place-items:center; color:var(--muted); font-weight:700;
+    font-size:14px; letter-spacing:.06em; text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-map" viewBox="0 0 48 48">
+    <path fill="currentColor" opacity=".35" d="M4 11 17 6v31L4 42zm27-5 13 5v31l-13-5z"/>
+    <path fill="currentColor" d="M17 6l14 5v31L17 37z"/>
+    <path fill="none" stroke="var(--card)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 4" d="M10 36c6-5 4-11 9-13s7-7 3-12"/>
+  </symbol>
+  <symbol id="i-giraffe" viewBox="0 0 48 48">
+    <path fill="currentColor" opacity=".35" d="M12 30h20a6 6 0 0 1 6 6v6H6v-6a6 6 0 0 1 6-6z"/>
+    <path fill="currentColor" d="M18.6 40V21.4c0-5.6 3.3-9.4 8.2-9.4 4.9 0 8.2 3.8 8.2 9.4V40h-5.4V21.4c0-2.2-1-3.6-2.8-3.6s-2.8 1.4-2.8 3.6V40z"/>
+    <path fill="currentColor" d="M27 4.6c-4 0-7 2.6-7 6.4 0 2.4 1.6 4 4 4h6c2.4 0 4-1.6 4-4 0-3.8-3-6.4-7-6.4z"/>
+    <path fill="currentColor" d="M21.6 2.6c.9 0 1.6.7 1.6 1.6v3h-3.2v-3c0-.9.7-1.6 1.6-1.6zm10.8 0c.9 0 1.6.7 1.6 1.6v3h-3.2v-3c0-.9.7-1.6 1.6-1.6z"/>
+    <circle cx="23.4" cy="10.2" r="1.3" fill="var(--card)"/><circle cx="30.6" cy="10.2" r="1.3" fill="var(--card)"/>
+  </symbol>
+  <symbol id="i-beach" viewBox="0 0 48 48">
+    <path fill="currentColor" d="M24 4c9 0 17 6 19 15H5C7 10 15 4 24 4z"/>
+    <path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" d="M24 19v23"/>
+    <path fill="currentColor" opacity=".4" d="M2 42h44v4H2z"/>
+  </symbol>
+  <symbol id="i-mountain" viewBox="0 0 48 48">
+    <path fill="currentColor" opacity=".45" d="M28 40 40 18l8 22z"/>
+    <path fill="currentColor" d="M2 40 18 10l16 30z"/>
+    <path fill="var(--card)" d="M18 10l5 9.4-5-2.4-5 2.4z"/>
+  </symbol>
+  <symbol id="i-city" viewBox="0 0 48 48">
+    <path fill="currentColor" opacity=".45" d="M4 22h12v20H4z"/>
+    <path fill="currentColor" d="M18 8h14v34H18z"/>
+    <path fill="currentColor" opacity=".45" d="M34 16h10v26H34z"/>
+    <path fill="var(--card)" d="M22 14h6v4h-6zm0 8h6v4h-6zm0 8h6v4h-6z"/>
+  </symbol>
+</svg>
+
+<!-- ------------------------------------------------------------- sign in -->
+<section class="screen" id="signin" hidden>
+  <div class="wrap">
+    <svg class="mark" aria-hidden="true"><use href="#i-map"/></svg>
+    <p class="eyebrow">Just the two of us</p>
+    <h1>Our <em>Trips</em></h1>
+    <p class="lede">Enter your email and we'll send you a link that signs you in. No password to remember.</p>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required autocomplete="email"
+             inputmode="email" placeholder="you@example.com">
+      <button type="submit" id="loginBtn">Send me a link</button>
+    </form>
+    <p class="note" id="loginNote" hidden></p>
+  </div>
+</section>
+
+<!-- ----------------------------------------------------------------- hub -->
+<section class="screen" id="hub" hidden>
+  <div class="wrap">
+    <div class="hubhead">
+      <div>
+        <svg class="mark" aria-hidden="true"><use href="#i-map"/></svg>
+        <p class="eyebrow">Just the two of us</p>
+        <h1>Our <em>Trips</em></h1>
+      </div>
+      <button class="linkish" id="signOutHub" type="button">Sign out</button>
+    </div>
+    <ul class="trips" id="tripList"></ul>
+    <div class="empty" id="noAccess" hidden></div>
+  </div>
+</section>
+
+<!-- ---------------------------------------------------------------- trip -->
+<section class="screen" id="viewer" hidden>
+  <div class="bar">
+    <button class="linkish" id="backBtn" type="button">&larr; All trips</button>
+    <strong id="viewerTitle"></strong>
+    <span class="spacer"></span>
+    <button class="linkish" id="signOutTrip" type="button">Sign out</button>
+  </div>
+  <iframe id="frame" title="Trip itinerary"
+          sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>
+</section>
+
+<div class="loading" id="boot">Loading</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

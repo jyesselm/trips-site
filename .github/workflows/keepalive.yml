@@ -1,0 +1,29 @@
+# Supabase pauses free projects after 7 days idle. Two pokes a week keeps the
+# timer from ever reaching zero. Uses the public anon key against the
+# heartbeat table, which is the one table anyone is allowed to read.
+name: keepalive
+
+on:
+  schedule:
+    - cron: '17 9 * * 1,4'   # Mondays and Thursdays
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Touch the database
+        env:
+          URL: ${{ vars.SUPABASE_URL }}
+          KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "Set repository variables SUPABASE_URL and SUPABASE_ANON_KEY."
+            echo "Settings -> Secrets and variables -> Actions -> Variables"
+            exit 1
+          fi
+          code=$(curl -s -o /tmp/out -w '%{http_code}' \
+            "$URL/rest/v1/heartbeat?select=beat_at&limit=1" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          echo "HTTP $code"; cat /tmp/out; echo
+          [ "$code" = "200" ]
