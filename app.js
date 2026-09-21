@@ -1,5 +1,5 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY, SHARED_ACCOUNT } from './config.js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SHARED_ACCOUNT } from './config.js?v=202609211246';
 
 // config.js ships with placeholders, so the page has to say so rather than
 // hanging on a client that cannot be constructed.
@@ -32,29 +32,32 @@ $('loginForm').addEventListener('submit', async (e) => {
   note.hidden = true;
   note.classList.remove('bad');
 
-  const { error } = await db.auth.signInWithPassword({ email: SHARED_ACCOUNT, password });
+  // Anything that goes wrong in here has to end up on screen. A button that
+  // silently does nothing is the worst possible failure mode.
+  try {
+    const { error } = await db.auth.signInWithPassword({ email: SHARED_ACCOUNT, password });
 
-  btn.disabled = false;
-  btn.textContent = 'Let me in';
+    if (error) {
+      note.hidden = false;
+      note.classList.add('bad');
+      note.textContent = /credential/i.test(error.message)
+        ? 'That password is not right.'
+        : error.message;
+      $('password').select();
+      return;
+    }
 
-  if (error) {
+    $('loginForm').reset();
+    await loadTrips();
+    await route();
+  } catch (err) {
     note.hidden = false;
     note.classList.add('bad');
-    note.textContent = /credential/i.test(error.message)
-      ? 'That password is not right.'
-      : error.message;
-    $('password').select();
-    return;
+    note.textContent = `Something broke: ${err?.message ?? err}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Let me in';
   }
-
-  $('loginForm').reset();
-  try {
-    await loadTrips();
-  } catch (err) {
-    $('noAccess').hidden = false;
-    $('noAccess').textContent = `Could not load trips: ${err.message}`;
-  }
-  await route();
 });
 
 for (const id of ['signOutHub', 'signOutTrip']) {
